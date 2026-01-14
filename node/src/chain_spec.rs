@@ -8,7 +8,7 @@ use sp_runtime::traits::{IdentifyAccount, Verify};
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 
-/// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
+/// Specialized `ChainSpec`. This is a specialization of the general Onyx ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig>;
 
 /// Generate a crypto pair from seed.
@@ -100,7 +100,7 @@ fn testnet_genesis(
 ) -> serde_json::Value {
 	serde_json::json!({
 		"balances": {
-			// Configure endowed accounts with initial balance of 1 << 60.
+			// Configure endowed accounts with initial balance of 1000000000 * 1000000000000.
 			"balances": endowed_accounts.iter().cloned().map(|k| (k, 1u64 << 60)).collect::<Vec<_>>(),
 		},
 		"aura": {

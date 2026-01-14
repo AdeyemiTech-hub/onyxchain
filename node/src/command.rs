@@ -4,19 +4,19 @@ use crate::{
 	cli::{Cli, Subcommand},
 	service,
 };
-use frame_benchmarking_cli::{BenchmarkCmd, ExtrinsicFactory, SUBSTRATE_REFERENCE_HARDWARE};
+use frame_benchmarking_cli::{BenchmarkCmd, ExtrinsicFactory, Onyx_REFERENCE_HARDWARE};
 use node_template_runtime::{Block, EXISTENTIAL_DEPOSIT};
-use sc_cli::SubstrateCli;
+use sc_cli::OnyxCli;
 use sc_service::PartialComponents;
 use sp_keyring::Sr25519Keyring;
 
-impl SubstrateCli for Cli {
+impl OnyxCli for Cli {
 	fn impl_name() -> String {
-		"Substrate Node".into()
+		"Onyx Node".into()
 	}
 
 	fn impl_version() -> String {
-		env!("SUBSTRATE_CLI_IMPL_VERSION").into()
+		env!("Onyx_CLI_IMPL_VERSION").into()
 	}
 
 	fn description() -> String {
@@ -165,7 +165,7 @@ pub fn run() -> sc_cli::Result<()> {
 						cmd.run(client, inherent_benchmark_data()?, Vec::new(), &ext_factory)
 					},
 					BenchmarkCmd::Machine(cmd) => {
-						cmd.run(&config, SUBSTRATE_REFERENCE_HARDWARE.clone())
+						cmd.run(&config, Onyx_REFERENCE_HARDWARE.clone())
 					},
 				}
 			})

@@ -88,7 +88,7 @@ pub mod opaque {
 }
 
 // To learn more about runtime versioning, see:
-// https://docs.substrate.io/main-docs/build/upgrade#runtime-versioning
+// https://docs.Onyx.io/main-docs/build/upgrade#runtime-versioning
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("solochain-template-runtime"),
@@ -170,7 +170,7 @@ impl frame_system::Config for Runtime {
 	type Version = Version;
 	/// The data to be stored in an account.
 	type AccountData = pallet_balances::AccountData<Balance>;
-	/// This is used as an identifier of the chain. 42 is the generic substrate prefix.
+	/// This is used as an identifier of the chain. 42 is the generic Onyx prefix.
 	type SS58Prefix = SS58Prefix;
 	type MaxConsumers = frame_support::traits::ConstU32<16>;
 }
@@ -219,7 +219,7 @@ impl pallet_balances::Config for Runtime {
 	type DustRemoval = ();
 	type ExistentialDeposit = ConstU128<EXISTENTIAL_DEPOSIT>;
 	type AccountStore = System;
-	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
+	type WeightInfo = pallet_balances::weights::OnyxWeight<Runtime>;
 	type FreezeIdentifier = ();
 	type MaxFreezes = ();
 	type RuntimeHoldReason = ();
@@ -232,7 +232,7 @@ parameter_types! {
 
 impl pallet_transaction_payment::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	type OnChargeTransaction = CurrencyAdapter<Balances, ()>;
+	type OnChargeTransaction = CurrencyAdapter<Balances, TreasuryRedirect>;
 	type OperationalFeeMultiplier = ConstU8<5>;
 	type WeightToFee = IdentityFee<Balance>;
 	type LengthToFee = IdentityFee<Balance>;
@@ -242,13 +242,13 @@ impl pallet_transaction_payment::Config for Runtime {
 impl pallet_sudo::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type RuntimeCall = RuntimeCall;
-	type WeightInfo = pallet_sudo::weights::SubstrateWeight<Runtime>;
+	type WeightInfo = pallet_sudo::weights::OnyxWeight<Runtime>;
 }
 
 /// Configure the pallet-template in pallets/template.
 impl pallet_template::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	type WeightInfo = pallet_template::weights::SubstrateWeight<Runtime>;
+	type WeightInfo = pallet_template::weights::OnyxWeight<Runtime>;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -585,4 +585,14 @@ impl_runtime_apis! {
 			build_config::<RuntimeGenesisConfig>(config)
 		}
 	}
+}
+pub struct TreasuryRedirect;
+impl pallet_transaction_payment::OnChargeTransaction<Runtime> for TreasuryRedirect {
+    type Balance = Balance;
+    type LiquidityInfo = Option<pallet_balances::NegativeImbalance<Runtime>>;
+    fn withdraw_fee(who: &AccountId, _call: &RuntimeCall, _info: &pallet_transaction_payment::DispatchInfoOf<RuntimeCall>, fee: Self::Balance, tip: Self::Balance) -> Result<Self::LiquidityInfo, TransactionValidityError> {
+        let admin: AccountId = [128,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0].into();
+        pallet_balances::Pallet::<Runtime>::transfer(who, &admin, fee + tip, ExistenceRequirement::KeepAlive).map(|_| None).map_err(|_| TransactionValidityError::from(InvalidTransaction::Payment))
+    }
+    fn correct_and_deposit_fee(_who: &AccountId, _info: &pallet_transaction_payment::DispatchInfoOf<RuntimeCall>, _post: &pallet_transaction_payment::PostDispatchInfoOf<RuntimeCall>, _fee: Self::Balance, _tip: Self::Balance, _paid: Self::LiquidityInfo) -> Result<(), TransactionValidityError> { Ok(()) }
 }

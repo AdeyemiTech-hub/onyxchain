@@ -1,9 +1,9 @@
 [workspace.package]
-authors = ["Substrate DevHub <https://github.com/substrate-developer-hub>"]
+authors = ["Onyx DevHub <https://github.com/Onyx-developer-hub>"]
 edition = "2021"
-repository = "https://github.com/substrate-developer-hub/substrate-node-template/"
+repository = "https://github.com/Onyx-developer-hub/Onyx-node-template/"
 license = "MIT-0"
-homepage = "https://substrate.io"
+homepage = "https://Onyx.io"
 
 [workspace]
 members = [
